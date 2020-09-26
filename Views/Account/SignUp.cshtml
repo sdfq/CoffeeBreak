@@ -1,0 +1,39 @@
+﻿@model SignUpViewModel
+<h1>Регистрация</h1>
+
+<form asp-controller="Account" asp-action="SignUp" method="post">
+    <div asp-validation-summary="All"></div>
+
+    <div>
+        <label>Логин</label>
+        <input asp-for="UserName" />
+        <span asp-validation-for="UserName"></span>
+    </div>
+    <div>
+        <label>Имя</label>
+        <input asp-for="FirstName" />
+        <span asp-validation-for="FirstName"></span>
+    </div>
+    <div>
+        <label>Фамилия</label>
+        <input asp-for="LastName" />
+        <span asp-validation-for="LastName"></span>
+    </div>
+    <div>
+        <label>Телефон</label>
+        <input asp-for="CellPhone" />
+        <span asp-validation-for="CellPhone"></span>
+    </div>
+    <div>
+        <label>Пароль</label>
+        <input asp-for="Password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+
+    <p>
+        <button type="submit">Зарегистрироваться</button>
+    </p>
+</form>
+<p>
+    <a asp-controller="Account" asp-action="Login">Войти</a>
+</p>

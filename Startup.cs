@@ -2,7 +2,6 @@ using CoffeeBreak.Data;
 using CoffeeBreak.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,21 +37,21 @@ namespace CoffeeBreak
 
             services.ConfigureApplicationCookie(config =>
             {
-                config.LoginPath = "/Admin/Login";
+                config.LoginPath = "/Account/Login";
                 config.AccessDeniedPath = "/Home/AccessDenied";
             });
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("Administrator", builder =>
+                options.AddPolicy("admin", builder =>
                 {
-                    builder.RequireClaim(ClaimTypes.Role, "Administrator");
+                    builder.RequireClaim(ClaimTypes.Role, "admin");
                 });
 
-                options.AddPolicy("Manager", builder =>
+                options.AddPolicy("customer", builder =>
                 {
-                    builder.RequireAssertion(x => x.User.HasClaim(ClaimTypes.Role, "Manager")
-                                                  || x.User.HasClaim(ClaimTypes.Role, "Administrator"));
+                    builder.RequireAssertion(x => x.User.HasClaim(ClaimTypes.Role, "customer")
+                                                  || x.User.HasClaim(ClaimTypes.Role, "admin"));
                 });
 
             });
@@ -60,7 +59,6 @@ namespace CoffeeBreak
             services.AddControllersWithViews();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -76,10 +74,7 @@ namespace CoffeeBreak
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapDefaultControllerRoute();
             });
         }
     }
