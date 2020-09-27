@@ -1,8 +1,8 @@
-﻿<a asp-controller="Home" asp-action="Index">[Home]</a>
+﻿<a asp-controller="Home" asp-action="Index">[Домой]</a>
 <a asp-controller="Account" asp-action="Index">[Secured Zone]</a>
 @if (User.Identity.IsAuthenticated)
 {
-    <a asp-controller="Account" asp-action="Admin">[Administrator]</a>
-    <a asp-controller="Account" asp-action="Customer">[Customer]</a>
-    <a asp-controller="Account" asp-action="Logout">[Logout]</a>
+    <a asp-controller="Admin" asp-action="Index">[Административная панель]</a>
+    <a asp-controller="Account" asp-action="Customer">[Покупатель]</a>
+    <a asp-controller="Account" asp-action="Logout">[Выход]</a>
 }

@@ -1,0 +1,7 @@
+﻿<h1>Административная панель</h1>
+
+<p>Загрузить прайслист</p>
+<form asp-action="Parse" asp-controller="Pricelist" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" /><br>
+    <input type="submit" value="Загрузить" />
+</form>
