@@ -1,13 +1,14 @@
 ﻿using CoffeeBreak.Data;
 using CoffeeBreak.Entities;
+using CoffeeBreak.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic.FileIO;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CoffeeBreak.Controllers
@@ -27,54 +28,52 @@ namespace CoffeeBreak.Controllers
         {
             if (file != null)
             {
-                var today = DateTime.UtcNow;
-                
-
                 var pricelist = new Pricelist
                 {
-                    Created = today,
-                    NumberOfWeek = GetNumberOfWeek(today),
-                    StartAndEndWeek = GetStartAndEndWeek(today),
+                    Created = DateTimeHelper.Today(),
+                    NumberOfWeek = DateTimeHelper.GetNumberOfWeek(),
+                    StartAndEndWeek = DateTimeHelper.GetStartAndEndOfWeek(),
                 };
 
                 await context.Pricelists.AddAsync(pricelist);
                 await context.SaveChangesAsync();
 
                 var currentPricelist = await context.Pricelists.FirstOrDefaultAsync(x => x.NumberOfWeek == pricelist.NumberOfWeek);
-                var result = new StringBuilder();
-                using var stream = file.OpenReadStream();
-                using var reader = new StreamReader(stream);
+                var coffeeProducts = new List<CoffeeProduct>();
+                using (TextFieldParser parser = new TextFieldParser(file.OpenReadStream()))
+                {
+                    parser.TextFieldType = FieldType.Delimited;
+                    parser.SetDelimiters(",");
+                    IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+                    while (!parser.EndOfData)
+                    {
+                        string[] fields = parser.ReadFields();
+
+                        var coffee = new CoffeeProduct
+                        {
+                            Name = fields[0],
+                            
+                            PriceBigPacket = decimal.Parse(fields[1], formatter),
+                            PriceBigPacketDiscount10 = decimal.Multiply(decimal.Parse(fields[1], formatter), Convert.ToDecimal(0.9)),
+                            PriceBigPacketDiscount20 = decimal.Multiply(decimal.Parse(fields[1], formatter), Convert.ToDecimal(0.8)),
+                            PriceBigPacketDiscount30 = decimal.Multiply(decimal.Parse(fields[1], formatter), Convert.ToDecimal(0.7)),
+
+                            PriceSmallPacket = decimal.Parse(fields[2], formatter),
+                            PriceSmallPacketDiscount10 = decimal.Multiply(decimal.Parse(fields[2], formatter), Convert.ToDecimal(0.9)),
+                            PriceSmallPacketDiscount20 = decimal.Multiply(decimal.Parse(fields[2], formatter), Convert.ToDecimal(0.8)),
+                            PriceSmallPacketDiscount30 = decimal.Multiply(decimal.Parse(fields[2], formatter), Convert.ToDecimal(0.7)),
+                            
+                            PricelistId = currentPricelist.Id
+                        };
+
+                        coffeeProducts.Add(coffee);
+                    }
+                }
+
+                await context.AddRangeAsync(coffeeProducts);
+                await context.SaveChangesAsync();
             }
             return View();
-        }
-
-       
-        /// <summary>
-        /// Calc start day and end day of current week
-        /// </summary>
-        /// <param name="today"></param>
-        /// <returns></returns>
-        private string GetStartAndEndWeek(DateTime today)
-        {
-            // TODO correct calc start and end of week (maybe use our timezone and our calendar)
-            // remove time in date
-            int days = today.DayOfWeek - DayOfWeek.Monday;
-            var start = today.AddDays(-days);
-            var end = start.AddDays(6);
-
-            return $"Цены действительны с {start} по {end}";
-        }
-
-        /// <summary>
-        /// Calc number of week 
-        /// </summary>
-        /// <param name="today"></param>
-        /// <returns></returns>
-        private int GetNumberOfWeek(DateTime today)
-        {
-            // TODO correct calc number of week
-            var calendar = new GregorianCalendar();
-            return calendar.GetWeekOfYear(today, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
         }
     }
 }

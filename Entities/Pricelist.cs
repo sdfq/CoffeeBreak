@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace CoffeeBreak.Entities
 {
@@ -11,5 +13,7 @@ namespace CoffeeBreak.Entities
         public string StartAndEndWeek { get; set; }
 
         public DateTime Created { get; set; }
+
+        public ICollection<CoffeeProduct> CoffeeProducts { get; set; }
     }
 }
