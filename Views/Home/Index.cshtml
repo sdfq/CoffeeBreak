@@ -1,16 +1,51 @@
-﻿<h1>PriceList</h1>
-<partial name="_Menu" />
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<p>Coffee 1 - 350 rub</p>
-<partial name="_UserInfo" />
+﻿@model IReadOnlyCollection<CoffeeViewModel>
+@{
+    ViewData["Title"] = "Товары";
+}
+<nav class="navbar navbar-light">
+    <input class="form-control form-control-sm" type="text" id="search" placeholder="Поиск... введите название кофе или чая">
+</nav>
+<h2>Кофе</h2>
+<table class="table table-sm table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th class="text-center">Название</th>
+            <th class="text-center">Цена за 1кг</th>
+            <th class="text-center">Цена за 250г</th>
+            <th class="text-center">Вес</th>
+            <th class="text-center">Помол</th>
+            <th class="text-center">Количество</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody data-products>
+        @foreach (var coffee in Model)
+        {
+            <form method="post" asp-action="" asp-controller="">
+                <tr>
+                    <td class="align-middle" id="@coffee.Id">@coffee.Name</td>
+                    <td class="text-center align-middle">@coffee.PriceBigPacket</td>
+                    <td class="text-center align-middle">@coffee.PriceSmallPacket</td>
+                    <td class="text-center align-middle">
+                        <select class="form-control form-control-sm" asp-for="@coffee.Packet" asp-items="Html.GetEnumSelectList<BagSize>()"></select>
+                    </td>
+                    <td class="text-center align-middle">
+                        <select class="form-control form-control-sm" asp-for="@coffee.Ground" asp-items="Html.GetEnumSelectList<Grind>()">
+                            <option disabled selected>Выбрать... </option>
+                        </select>
+                    </td>
+                    <td class="text-center align-middle">
+                        <input asp-for="@coffee.Count" min="1" max="99" value="1" type="number" class="form-control form-control-sm" />
+                    </td>
+                    <td class="text-center"><button class="btn btn-info btn-sm" type="submit">Добавить</button></td>
+                </tr>
+            </form>
+        }
+    </tbody>
+    <tfoot>
+    </tfoot>
+</table>
+
+@section Scripts {
+    <script src="~/js/liveSearch.js" asp-append-version="true"></script>
+}
